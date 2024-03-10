@@ -90,7 +90,7 @@ def verify_patient_creation(fhir_client, mrn, system):
         last_name = patient.name[0].family if patient.name and patient.name[0].family else "Not provided"
         birthdate = patient.birthDate.isostring if patient.birthDate else "Not provided"
         age = calculate_age(birthdate) if patient.birthDate else "Not provided"
-        gender = patient.gender if patient.gender else "Not provided"
+        # gender = patient.gender if patient.gender else "Not provided"
 
         # Display details
         st.success("Verification successful. Found Patient:")
