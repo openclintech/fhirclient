@@ -68,8 +68,15 @@ def print_details(resource_id, mrn, base_uri):
     st.success(f"Patient creation successful. Resource ID: {resource_id}, MRN: {mrn}")
     st.write(f"Full URL: {full_url}")
 
+def calculate_age(birthdate):
+    """Calculate age given the birthdate."""
+    today = datetime.today()
+    birthdate = datetime.strptime(birthdate, "%Y-%m-%d")
+    age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    return age
+
 def verify_patient_creation(fhir_client, mrn, system):
-    """Verify patient creation by searching for the patient using their MRN."""
+    """Verify patient creation by searching for the patient using their MRN and display details nicely."""
     search = p.Patient.where(struct={'identifier': f"{system}|{mrn}"})
     patients = search.perform_resources(fhir_client.server)
     if patients:
@@ -77,10 +84,28 @@ def verify_patient_creation(fhir_client, mrn, system):
         resource_id = patient.id
         base_uri = fhir_client.server.base_uri
         full_url = f"{base_uri}/Patient/{resource_id}"
-        st.success(f"Verification successful. Found Patient with Resource ID: {resource_id}, MRN: {mrn}")
-        st.write(f"Full URL: {full_url}")
+
+        # Extract details
+        first_name = patient.name[0].given[0] if patient.name and patient.name[0].given else "Not provided"
+        last_name = patient.name[0].family if patient.name and patient.name[0].family else "Not provided"
+        birthdate = patient.birthDate.isostring if patient.birthDate else "Not provided"
+        age = calculate_age(birthdate) if patient.birthDate else "Not provided"
+        gender = patient.gender if patient.gender else "Not provided"
+
+        # Display details
+        st.success("Verification successful. Found Patient:")
+        st.json({
+            "MRN": mrn,
+            "Record ID": resource_id,
+            "First Name": first_name,
+            "Last Name": last_name,
+            "Date of Birth": birthdate,
+            "Age": age,
+            "Gender": gender,
+            "Full URL": full_url
+        })
     else:
-        print("Verification failed. No patient found with the given MRN.")
+        st.error("Verification failed. No patient found with the given MRN.")
 
 def app():
     st.title('FHIR Patient Management')
