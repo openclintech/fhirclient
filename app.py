@@ -101,7 +101,7 @@ def verify_patient_creation(fhir_client, mrn, system):
             "Last Name": last_name,
             "Date of Birth": birthdate,
             "Age": age,
-            "Gender": gender,
+            # "Gender": gender,
             "Full URL": full_url
         })
     else:
