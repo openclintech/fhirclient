@@ -1,7 +1,7 @@
 import streamlit as st
 from fhirclient import client
 import fhirclient.models.patient as p
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 
 def initialize_fhir_client():
@@ -118,10 +118,12 @@ def app():
         st.subheader("Create a New Patient")
         first_name = st.text_input("Enter the patient's first name:")
         last_name = st.text_input("Enter the patient's last name:")
-        birthdate = st.text_input("Enter the patient's birthdate (YYYY-MM-DD):")
+        birthdate = st.date_input("Enter the patient's birthdate:", min_value=date(1900, 1, 1), max_value=date.today())
+        #birthdate = st.text_input("Enter the patient's birthdate (YYYY-MM-DD):")
 
         if st.button('Create Patient'):
             if first_name and last_name and birthdate:
+                birthdate_str = birthdate.strftime("%Y-%m-%d")
                 mrn, resource_id = create_and_post_patient(fhir_client, first_name, last_name, birthdate)
                 verify_patient_creation(fhir_client, mrn, system)  # Or print_details directly if preferred
             else:
