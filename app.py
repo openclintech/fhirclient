@@ -123,7 +123,7 @@ def app():
 
         if st.button('Create Patient'):
             if first_name and last_name and birthdate:
-                birthdate_str = birthdate.strftime("%Y-%m-%d")
+                birthdate_str = birthdate.isoformat()  # Convert to "YYYY-MM-DD" string format
                 mrn, resource_id = create_and_post_patient(fhir_client, first_name, last_name, birthdate)
                 verify_patient_creation(fhir_client, mrn, system)  # Or print_details directly if preferred
             else:
